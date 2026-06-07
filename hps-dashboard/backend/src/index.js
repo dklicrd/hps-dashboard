@@ -3,6 +3,7 @@
  */
 import 'dotenv/config';
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
@@ -27,6 +28,17 @@ app.get('/api/health', (req, res) => {
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
+
+// Servir frontend estático en producción
+const __dirname = new URL('.', import.meta.url).pathname;
+const publicPath = path.join(__dirname, '../public');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(publicPath));
+  // SPA fallback: todas las rutas no-API sirven index.html
+  app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // 404 handler
 app.use((req, res) => {
