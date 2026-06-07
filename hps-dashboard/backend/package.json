@@ -1,0 +1,24 @@
+{
+  "name": "hps-dashboard-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend API para Dashboard Integral HPS-Import",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "migrate": "npx knex migrate:latest --knexfile src/db/knexfile.js",
+    "migrate:rollback": "npx knex migrate:rollback --knexfile src/db/knexfile.js",
+    "seed": "npx knex seed:run --knexfile src/db/knexfile.js",
+    "setup": "npm run migrate && npm run seed"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
+    "pg": "^8.13.1"
+  }
+}
