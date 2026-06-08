@@ -5,11 +5,16 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
+import knex from 'knex';
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
+import config from './db/knexfile.js';
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '3001');
+const PORT = parseInt(process.env.PORT || process.env.NODE_PORT || '3001');
+
+const env = process.env.NODE_ENV || 'development';
+const db = knex(config[env]);
 
 // Middleware global
 app.use(cors());
@@ -21,7 +26,7 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
+    environment: env,
   });
 });
 
@@ -32,7 +37,7 @@ app.use('/api', apiRoutes);
 // Servir frontend estático en producción
 const __dirname = new URL('.', import.meta.url).pathname;
 const publicPath = path.join(__dirname, '../public');
-if (process.env.NODE_ENV === 'production') {
+if (env === 'production') {
   app.use(express.static(publicPath));
   // SPA fallback: todas las rutas no-API sirven index.html
   app.get(/^(?!\/api).*/, (req, res) => {
@@ -51,8 +56,25 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-app.listen(PORT, () => {
-  console.log(`📊 HPS-Dashboard API corriendo en puerto ${PORT}`);
-  console.log(`   Entorno: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`   Health: http://localhost:${PORT}/api/health`);
-});
+// Auto-migrate on startup, then start listening
+async function start() {
+  try {
+    console.log('🔄 Running migrations...');
+    await db.migrate.latest();
+    console.log('✅ Migrations applied');
+
+    console.log('🌱 Running seeds...');
+    await db.seed.run();
+    console.log('✅ Seeds applied');
+  } catch (err) {
+    console.warn('⚠️  Migration/seed error (DB may not be ready):', err.message);
+  }
+
+  app.listen(PORT, () => {
+    console.log(`📊 HPS-Dashboard API corriendo en puerto ${PORT}`);
+    console.log(`   Entorno: ${env}`);
+    console.log(`   Health: http://localhost:${PORT}/api/health`);
+  });
+}
+
+start();
