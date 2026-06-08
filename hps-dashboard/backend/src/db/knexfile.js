@@ -32,6 +32,7 @@ const config = {
       ssl: {
         rejectUnauthorized: false,
       },
+      statement_timeout: 10000,
     },
     migrations: {
       directory: './migrations',
