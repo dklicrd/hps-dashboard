@@ -5,16 +5,13 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-import knex from 'knex';
+import db from './db/connection.js';
 import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
-import config from './db/knexfile.js';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || process.env.NODE_PORT || '3001');
-
 const env = process.env.NODE_ENV || 'development';
-const db = knex(config[env]);
 
 // Middleware global
 app.use(cors());
