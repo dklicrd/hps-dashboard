@@ -29,7 +29,9 @@ const config = {
     client: 'pg',
     connection: {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      ssl: {
+        rejectUnauthorized: false,
+      },
     },
     migrations: {
       directory: './migrations',
@@ -43,6 +45,7 @@ const config = {
       min: 2,
       max: 10,
     },
+    acquireConnectionTimeout: 10000,
   },
 };
 
