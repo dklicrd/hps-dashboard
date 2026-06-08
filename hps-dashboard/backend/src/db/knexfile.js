@@ -44,8 +44,9 @@ const config = {
     pool: {
       min: 2,
       max: 10,
+      idleTimeoutMillis: 30000,
     },
-    acquireConnectionTimeout: 10000,
+    acquireConnectionTimeout: 30000,
   },
 };
 

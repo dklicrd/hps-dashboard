@@ -57,6 +57,7 @@ app.use((err, req, res, next) => {
 async function start() {
   try {
     console.log('🔄 Running migrations...');
+    console.log('   Env:', env, 'DB URL:', (process.env.DATABASE_URL || '').replace(/:[^:@]+@/, ':****@'));
     await db.migrate.latest();
     console.log('✅ Migrations applied');
 
@@ -65,6 +66,7 @@ async function start() {
     console.log('✅ Seeds applied');
   } catch (err) {
     console.warn('⚠️  Migration/seed error (DB may not be ready):', err.message);
+    console.warn('   Stack:', err.stack?.split('\n').slice(0, 3).join('\n   '));
   }
 
   app.listen(PORT, () => {
